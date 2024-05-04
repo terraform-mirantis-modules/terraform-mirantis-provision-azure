@@ -1,0 +1,1 @@
+# Provisioning Azure infrastructure for Mirantis Launchpad
