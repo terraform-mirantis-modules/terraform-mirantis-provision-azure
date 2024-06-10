@@ -9,7 +9,7 @@ locals {
 
 module "platform" {
   count  = length(local.unique_used_platforms)
-  source = "./terraform-mirantis-provision-azure/modules/platform"
+  source = "./provision-azure/modules/platform"
 
   platform_key = local.unique_used_platforms[count.index]
   #   windows_password = "dddTest!@"
@@ -21,6 +21,6 @@ locals {
   platforms_with_sku = { for k, p in local.unique_used_platforms : p => module.platform[k].platform }
 }
 
-output "platform" {
+output "unique_platforms" {
   value = local.platforms_with_sku
 }

@@ -14,3 +14,8 @@ variable "resource_group_name" {
   description = "Resource group name to create the keypair in"
   type        = string
 }
+
+variable "location" {
+  description = "Azure location for the resources"
+  type        = string
+}

@@ -5,7 +5,7 @@ resource "tls_private_key" "rsa" {
 resource "azurerm_ssh_public_key" "keypair" {
   name                = var.name
   resource_group_name = var.resource_group_name
-  location            = "West Europe"
+  location            = var.location
   public_key          = tls_private_key.rsa.public_key_openssh
   tags = merge({
     stack     = var.name

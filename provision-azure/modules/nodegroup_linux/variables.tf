@@ -64,3 +64,23 @@ variable "volume_size" {
   description = "The disk/volume size of the machine"
   type        = number
 }
+
+variable "security_groups_ids" {
+  description = "The security groups to apply to the machine"
+  type        = list(string)
+}
+
+variable "lb_pool_ids" {
+  description = "The load balancer pool ids"
+  type        = list(string)
+}
+
+variable "source_image" {
+  description = "The source image to use for the machine"
+  type = object({
+    sku       = string
+    publisher = string
+    offer     = string
+    version   = string
+  })
+}
