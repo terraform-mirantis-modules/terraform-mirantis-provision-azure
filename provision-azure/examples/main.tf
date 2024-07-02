@@ -23,12 +23,14 @@ locals {
 }
 
 module "provision" {
-  source = "./provision-azure"
+  source = "../"
 
   name             = var.name
   location         = var.location
-  windows_password = "P@ssw0rd123"
+  windows_password = var.windows_password
   ingresses        = local.launchpad_ingresses
+  network          = var.network
+  subnets          = var.subnets
 
   nodegroups = { for k, ngd in local.nodegroups_wplatform : k => {
     sku : ngd.sku
@@ -45,25 +47,4 @@ module "provision" {
   } }
   securitygroups = local.securitygroups
   extra_tags     = var.common_tags
-}
-
-# output "hosts" {
-#   description = "The hosts provisioned by the module"
-#   value       = merge(module.provision.linux_hosts, module.provision.windows_hosts)
-# }
-
-output "machine_sg" {
-  value = module.provision.machine_sg
-}
-
-# output "mapped_sgs" {
-#   value = module.provision.mapped_sgs
-# }
-
-output "all_lb" {
-  value = module.provision.all_lb
-}
-
-output "mapped_lb_pool" {
-  value = module.provision.mapped_lb_pool
 }

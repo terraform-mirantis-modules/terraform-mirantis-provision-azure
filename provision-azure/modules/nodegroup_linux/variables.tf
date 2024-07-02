@@ -4,9 +4,12 @@ variable "name" {
   type        = string
 }
 
-variable "subnet_id" {
-  description = "value of the subnet id"
-  type        = string
+variable "subnets" {
+  description = "list of subnet ids where the node group will be deployed"
+  type = list(object({
+    id      = string
+    private = bool
+  }))
 }
 
 variable "ssh_pub_key" {
@@ -65,8 +68,8 @@ variable "volume_size" {
   type        = number
 }
 
-variable "security_groups_ids" {
-  description = "The security groups to apply to the machine"
+variable "app_security_group_names" {
+  description = "The application security groups to apply to the machine"
   type        = list(string)
 }
 
