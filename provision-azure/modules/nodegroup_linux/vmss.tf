@@ -1,3 +1,15 @@
+data "azurerm_application_security_group" "asg_in" {
+  count               = length(var.app_security_group_names)
+  name                = "${var.app_security_group_names[count.index]}-asg-inbound"
+  resource_group_name = var.resource_group_name
+}
+
+data "azurerm_application_security_group" "asg_out" {
+  count               = length(var.app_security_group_names)
+  name                = "${var.app_security_group_names[count.index]}-asg-outbound"
+  resource_group_name = var.resource_group_name
+}
+
 # This file contains the code to create a Linux Virtual Machine Scale Set
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   name                = "Linux-${var.name}"
@@ -7,7 +19,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   instances           = var.vm_count
   admin_username      = var.user
 
-  computer_name_prefix = "${var.name}-"
+  computer_name_prefix = var.name
 
   zone_balance = true
   zones        = [1, 2, 3]
@@ -33,20 +45,24 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   }
 
   dynamic "network_interface" {
-    for_each = var.security_groups_ids
+    for_each = var.subnets
     content {
-      name                      = "${var.name}-n-interface-${network_interface.key}"
-      primary                   = var.security_groups_ids[0] == network_interface.value ? true : false
-      network_security_group_id = network_interface.value
+      name    = "${var.name}-n-interface-${network_interface.key}"
+      primary = var.subnets[0].id == network_interface.value.id ? true : false
 
       ip_configuration {
-        name                                   = "ipconfig-linux-${network_interface.key}"
-        primary                                = var.security_groups_ids[0] == network_interface.value ? true : false
-        subnet_id                              = var.subnet_id
+        name                                   = "ipconfig-linux-${network_interface.key}-${basename(network_interface.value.id)}"
+        primary                                = var.subnets[0].id == network_interface.value.id ? true : false
+        subnet_id                              = network_interface.value.id
         load_balancer_backend_address_pool_ids = var.lb_pool_ids
+        application_security_group_ids         = toset(concat([for asg in data.azurerm_application_security_group.asg_in : asg.id], [for asg in data.azurerm_application_security_group.asg_out : asg.id]))
 
-        public_ip_address {
-          name = "${var.name}-ip-${network_interface.key}"
+        // if the subnet is private don't create a public ip address
+        dynamic "public_ip_address" {
+          for_each = network_interface.value.private ? [] : [1]
+          content {
+            name = "${var.name}-linux-ip-${network_interface.key}-${basename(network_interface.value.id)}"
+          }
         }
       }
     }

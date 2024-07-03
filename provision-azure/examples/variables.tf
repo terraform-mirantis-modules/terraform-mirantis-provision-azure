@@ -9,6 +9,32 @@ variable "ssh_pk_location" {
   default     = ""
 }
 
+# === Network ===
+variable "network" {
+  description = "Network configuration"
+  type = object({
+    cidr               = string
+    enable_vpn_gateway = bool
+    enable_nat_gateway = bool
+  })
+  default = {
+    cidr               = "172.31.0.0/16"
+    enable_vpn_gateway = false
+    enable_nat_gateway = false
+  }
+}
+
+# === subnets ===
+variable "subnets" {
+  description = "Subnets configuration"
+  type = map(object({
+    cidr       = string
+    nodegroups = list(string)
+    private    = bool
+  }))
+  default = {}
+}
+
 # === Machines ===
 variable "nodegroups" {
   description = "A map of machine group definitions"
@@ -30,7 +56,12 @@ variable "nodegroups" {
 variable "location" {
   description = "The location of the resource group"
   type        = string
-  default     = "West Europe"
+}
+
+variable "windows_password" {
+  description = "Password to use with windows & winrm"
+  type        = string
+  default     = ""
 }
 
 variable "common_tags" {
