@@ -7,6 +7,6 @@ data "azurerm_virtual_machine_scale_set" "hosts" {
   resource_group_name = var.resource_group_name
 }
 
-output "linux_hosts" {
-  value = data.azurerm_virtual_machine_scale_set.hosts.instances
+output "nodes" {
+  value = { for nk, nv in data.azurerm_virtual_machine_scale_set.hosts.instances : nk => nv }
 }

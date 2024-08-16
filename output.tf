@@ -1,11 +1,13 @@
 output "private_key" {
-  value = module.key.private_key
+  value     = module.key.private_key
+  sensitive = true
 }
 
-output "linux_hosts" {
-  value = { for ngn, v in local.nodegroups_linux : ngn => module.linux_vmms[ngn].linux_hosts }
+output "ingresses" {
+  description = "Created ingress data including urls"
+  value       = local.ingresses_withlb
 }
 
-output "windows_hosts" {
-  value = { for ngn, v in local.nodegroups_windows : ngn => module.windows_vmms[ngn].windows_hosts }
+output "nodegroups" {
+  value = local.nodegroups_safer
 }

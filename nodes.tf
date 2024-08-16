@@ -56,10 +56,10 @@ module "linux_vmms" {
   name                    = each.key
   subnets                 = [for sk, sv in local.map_nodegroups_to_subnets[each.key] : { id : azurerm_subnet.all[sv.id].id, private : sv.private }]
   vm_count                = each.value.count
-  user                    = each.value.user
   type                    = each.value.type
   role                    = each.value.role
   public                  = each.value.public
+  ssh_user                = each.value.user
   ssh_pub_key             = module.key.public_key
   volume_size             = each.value.volume_size
   source_image = {
@@ -73,9 +73,8 @@ module "linux_vmms" {
   app_security_group_names = concat([], [for nk, nv in var.nodegroups : [for sgk, sgv in var.securitygroups : sgk if contains(sgv.nodegroups, nk)]]...)
 
   tags = merge({
-    stack = var.name
-    role  = each.value.role
-  }, var.extra_tags)
+    role = each.value.role
+  }, local.tags)
 }
 
 // allowed values https://learn.microsoft.com/en-us/rest/api/compute/virtual-machines/create-or-update?view=rest-compute-2024-03-01&tabs=HTTP#osprofile
@@ -88,7 +87,7 @@ module "windows_vmms" {
   subnets                 = [for sk, sv in local.map_nodegroups_to_subnets[each.key] : { id : azurerm_subnet.all[sv.id].id, private : sv.private }]
   name                    = each.key
   vm_count                = each.value.count
-  user                    = each.value.user
+  winrm_user              = each.value.user
   windows_password        = var.windows_password
   type                    = each.value.type
   role                    = each.value.role
@@ -107,7 +106,57 @@ module "windows_vmms" {
 
 
   tags = merge({
-    stack = var.name
-    role  = each.value.role
-  }, var.extra_tags)
+    role = each.value.role
+  }, local.tags)
+}
+
+// locals created after node groups are provisioned.
+locals {
+  // combine node-group asg & node information for Linux nodes after creation
+  linux_nodegroups = { for k, ng in var.nodegroups : k => merge(ng, {
+    nodes : module.linux_vmms[k].nodes
+  }) if ng.type == "linux" }
+
+  // combine node-group asg & node information for Windows nodes after creation
+  windows_nodegroups = { for k, ng in var.nodegroups : k => merge(ng, {
+    nodes : module.windows_vmms[k].nodes
+  }) if ng.type == "windows" }
+
+  nodegroups = merge(local.linux_nodegroups, local.windows_nodegroups)
+
+  // a safer nodegroup  Linuxlisting that doesn't have any sensitive data.
+  linux_nodegroups_safer = { for k, ng in var.nodegroups : k => merge(ng, {
+    nodes : [for j, i in module.linux_vmms[k].nodes : {
+      nodegroup       = k
+      index           = j
+      id              = "${k}-${j}"
+      label           = ""
+      instance_id     = i.virtual_machine_id
+      private_ip      = i.private_ip_address
+      private_dns     = "" // there is not private dns in the instance output
+      private_address = i.private_ip_address
+      public_ip       = i.public_ip_address
+      public_dns      = "" // there is not public dns in the instance output
+      public_address  = i.public_ip_address
+    }]
+  }) if ng.type == "linux" }
+
+  // a safer nodegroup Windows listing that doesn't have any sensitive data.
+  windows_nodegroups_safer = { for k, ng in var.nodegroups : k => merge(ng, {
+    nodes : [for j, i in module.windows_vmms[k].nodes : {
+      nodegroup       = k
+      index           = j
+      id              = "${k}-${j}"
+      label           = ""
+      instance_id     = i.virtual_machine_id
+      private_ip      = i.private_ip_address
+      private_dns     = "" // there is not private dns in the instance output
+      private_address = i.private_ip_address
+      public_ip       = i.public_ip_address
+      public_dns      = "" // there is not public dns in the instance output
+      public_address  = i.public_ip_address
+    }]
+  }) if ng.type == "windows" }
+
+  nodegroups_safer = merge(local.linux_nodegroups_safer, local.windows_nodegroups_safer)
 }

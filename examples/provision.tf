@@ -1,0 +1,37 @@
+locals {
+  // combine the nodegroup definition with the platform data
+  nodegroups_wplatform = { for k, ngd in var.nodegroups : k => merge(ngd, local.platforms_with_sku[ngd.platform]) }
+}
+
+module "provision" {
+  source = "../"
+
+  name             = var.name
+  location         = var.location
+  windows_password = var.windows_password
+  ingresses        = local.launchpad_ingresses
+  network          = var.network
+  subnets          = var.subnets
+
+  nodegroups = { for k, ngd in local.nodegroups_wplatform : k => {
+    sku : ngd.sku
+    offer : ngd.offer
+    publisher : ngd.publisher
+    platform : ngd.platform
+    type : ngd.type
+    count : ngd.count
+    volume_size : ngd.volume_size
+    role : ngd.role
+    public : ngd.public
+    user_data : ngd.user_data
+    user : try(ngd.ssh_user, ngd.winrm_user)
+  } }
+  securitygroups = local.securitygroups
+  common_tags    = var.common_tags
+}
+
+locals {
+  // combine each node-group & platform definition with the provisioned nodes
+  nodegroups = { for k, ngp in local.nodegroups_wplatform : k => merge({ "name" : k }, ngp, module.provision.nodegroups[k]) }
+  ingresses  = { for k, i in local.launchpad_ingresses : k => merge({ "name" : k }, i, module.provision.ingresses[k]) }
+}

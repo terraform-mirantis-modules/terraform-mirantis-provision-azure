@@ -9,7 +9,7 @@ locals {
       "version" : "latest",
       "interface" : "eth0"
       "connection" : "ssh",
-      "user" : "ubuntu",
+      "ssh_user" : "ubuntu",
       "ssh_port" : 22,
       "type" : "linux"
     },
@@ -20,7 +20,7 @@ locals {
       "version" : "latest",
       "interface" : "Ethernet 3"
       "connection" : "winrm",
-      "user" : "miradmin",
+      "winrm_user" : "miradmin",
       "winrm_useHTTPS" : true,
       "winrm_insecure" : true,
       "type" : "windows"

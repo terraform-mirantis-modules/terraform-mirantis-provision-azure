@@ -86,8 +86,9 @@ variable "network" {
   })
 }
 
-variable "extra_tags" {
-  description = "Extra tags that will be added to all provisioned resources, where possible."
+# === Common ===
+variable "common_tags" {
+  description = "Tags that should be applied to all resources created"
   type        = map(string)
   default     = {}
 }

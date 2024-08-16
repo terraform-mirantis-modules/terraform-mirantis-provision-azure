@@ -3,6 +3,6 @@ data "azurerm_virtual_machine_scale_set" "windows_hosts" {
   resource_group_name = var.resource_group_name
 }
 
-output "windows_hosts" {
-  value = data.azurerm_virtual_machine_scale_set.windows_hosts.instances
+output "nodes" {
+  value = { for nk, nv in data.azurerm_virtual_machine_scale_set.windows_hosts.instances : nk => nv }
 }
