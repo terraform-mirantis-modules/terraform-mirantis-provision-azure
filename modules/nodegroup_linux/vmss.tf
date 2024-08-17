@@ -17,7 +17,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   location            = var.resource_group_location
   sku                 = "Standard_DS2_v2"
   instances           = var.vm_count
-  admin_username      = var.user
+  admin_username      = var.ssh_user
 
   computer_name_prefix = var.name
 
@@ -25,7 +25,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   zones        = [1, 2, 3]
 
   admin_ssh_key {
-    username   = var.user
+    username   = var.ssh_user
     public_key = var.ssh_pub_key
   }
 

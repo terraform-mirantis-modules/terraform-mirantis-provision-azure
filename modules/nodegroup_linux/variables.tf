@@ -22,7 +22,7 @@ variable "type" {
   type        = string
 }
 
-variable "user" {
+variable "ssh_user" {
   description = "The user to create on the machine"
   type        = string
 }

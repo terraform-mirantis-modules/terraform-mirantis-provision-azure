@@ -8,7 +8,7 @@ locals {
       "stack"   = var.name
       "created" = time_static.now.rfc3339
     },
-    var.extra_tags
+    var.common_tags
   )
 
 }

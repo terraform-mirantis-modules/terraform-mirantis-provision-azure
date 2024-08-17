@@ -2,17 +2,32 @@ name = "mirantis"
 
 location = "East US"
 
+launchpad = {
+  drain       = false
+  mcr_version = "23.0.12"
+  msr_version = "2.9.12"
+  mke_version = "3.7.12"
+
+  mke_connect = {
+    username = ""
+    password = ""
+    insecure = true
+  }
+  skip_create  = false
+  skip_destroy = false
+}
+
 subnets = {
   "AMain" = {
     cidr       = "172.31.0.0/17"
-    nodegroups = ["AMngr", "AWrkr"]
+    nodegroups = ["AMngr", "AWrkWin"]
     private    = false
   }
-  "APriv" = {
-    cidr       = "172.31.128.0/17"
-    nodegroups = ["AWrkPriv"]
-    private    = true
-  }
+  #"APriv" = {
+  #  cidr       = "172.31.128.0/17"
+  #  nodegroups = ["AWrkPriv"]
+  #  private    = true
+  #}
 }
 
 // configure the network stack
@@ -31,14 +46,22 @@ nodegroups = {
     public      = true
     volume_size = 100
   },
-  "AWrkPriv" = {
-    platform    = "ubuntu_22.04"
+  "AWrkWin" = {
+    platform    = "windows_2022"
     count       = 1
     type        = "Standard_DS2_v2"
     role        = "manager"
     public      = true
-    volume_size = 100
+    volume_size = 200
   },
+  # "AWrkPriv" = {
+  #   platform    = "ubuntu_22.04"
+  #   count       = 1
+  #   type        = "Standard_DS2_v2"
+  #   role        = "manager"
+  #   public      = true
+  #   volume_size = 100
+  # },
 }
 
 common_tags = {

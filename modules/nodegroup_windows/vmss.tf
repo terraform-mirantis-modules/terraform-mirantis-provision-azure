@@ -17,7 +17,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss" {
   location            = var.resource_group_location
   sku                 = "Standard_DS2_v2"
   instances           = var.vm_count
-  admin_username      = var.user
+  admin_username      = var.winrm_user
   admin_password      = var.windows_password
 
   computer_name_prefix = var.name

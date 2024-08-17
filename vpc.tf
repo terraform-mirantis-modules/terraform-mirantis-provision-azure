@@ -2,6 +2,7 @@
 resource "azurerm_resource_group" "rg" {
   name     = var.name
   location = var.location
+  tags     = local.tags
 }
 
 resource "azurerm_network_security_group" "main" {
@@ -32,7 +33,7 @@ resource "azurerm_network_security_group" "main" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-  tags = var.extra_tags
+  tags = local.tags
 }
 
 locals {
@@ -45,7 +46,7 @@ resource "azurerm_application_security_group" "machines_inbound" {
   name                = "${each.key}-asg-inbound"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  # tags                = merge(each.value.tags, var.extra_tags)
+  tags                = merge(var.securitygroups[each.key].tags, local.tags)
 }
 
 resource "azurerm_application_security_group" "machines_outbound" {
@@ -53,7 +54,7 @@ resource "azurerm_application_security_group" "machines_outbound" {
   name                = "${each.key}-asg-outbound"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  # tags                = merge(each.value.tags, var.extra_tags)
+  tags                = merge(var.securitygroups[each.key].tags, local.tags)
 }
 
 resource "azurerm_network_security_group" "machines" {
@@ -91,7 +92,7 @@ resource "azurerm_network_security_group" "machines" {
       source_application_security_group_ids = [azurerm_application_security_group.machines_outbound[each.key].id]
     }
   }
-  # tags = merge(each.value.tags, var.extra_tags)
+  tags = merge(each.value.tags, local.tags)
 }
 
 # Create a virtual network within the resource group
@@ -100,6 +101,7 @@ resource "azurerm_virtual_network" "vpc" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   address_space       = [var.network.cidr]
+  tags                = local.tags
 }
 
 locals {
@@ -122,6 +124,7 @@ resource "azurerm_public_ip" "subnet" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Dynamic"
+  tags                = local.tags
 }
 
 // Create a public IP address
@@ -137,6 +140,7 @@ resource "azurerm_network_interface" "subnet" {
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.subnet[each.key].id
   }
+  tags = local.tags
 }
 
 resource "azurerm_subnet_network_security_group_association" "public" {
@@ -173,4 +177,5 @@ resource "azurerm_network_security_group" "public" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+  tags = local.tags
 }

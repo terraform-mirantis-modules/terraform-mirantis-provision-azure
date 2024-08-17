@@ -8,7 +8,7 @@ output "lb_ingress" {
   value       = azurerm_lb_rule.ingress
 }
 
-output "lb_ip" {
+output "lb_dns" {
   description = "The load balancer url up"
   value       = azurerm_public_ip.ingress.ip_address
 }
