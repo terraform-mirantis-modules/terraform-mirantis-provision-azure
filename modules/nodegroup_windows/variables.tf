@@ -42,11 +42,6 @@ variable "role" {
   type        = string
 }
 
-variable "public" {
-  description = "Whether the machine is public"
-  type        = bool
-}
-
 variable "user_data" {
   description = "The user data to pass to the machine"
   type        = string

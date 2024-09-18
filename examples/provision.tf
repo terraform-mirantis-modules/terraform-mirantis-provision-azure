@@ -14,9 +14,12 @@ module "provision" {
   subnets          = var.subnets
 
   nodegroups = { for k, ngd in local.nodegroups_wplatform : k => {
-    sku : ngd.sku
-    offer : ngd.offer
-    publisher : ngd.publisher
+    source_image : {
+      sku : ngd.sku
+      offer : ngd.offer
+      publisher : ngd.publisher
+      version : "latest"
+    }
     platform : ngd.platform
     type : ngd.type
     count : ngd.count
