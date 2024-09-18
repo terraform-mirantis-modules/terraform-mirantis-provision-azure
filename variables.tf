@@ -59,9 +59,12 @@ variable "securitygroups" {
 variable "nodegroups" {
   description = "A map of machine group definitions"
   type = map(object({
-    sku                   = string
-    offer                 = string
-    publisher             = string
+    source_image = object({
+      sku       = string
+      offer     = string
+      publisher = string
+      version   = string
+    })
     platform              = string
     type                  = string
     count                 = number

@@ -69,3 +69,8 @@ variable "common_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "subscription_id" {
+  description = "The Azure subscription id to use"
+  type        = string
+}
