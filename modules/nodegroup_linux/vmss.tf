@@ -24,6 +24,11 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   zone_balance = true
   zones        = [1, 2, 3]
 
+  plan {
+    name      = var.source_image.sku
+    publisher = var.source_image.publisher
+    product   = var.source_image.offer
+  }
   admin_ssh_key {
     username   = var.ssh_user
     public_key = var.ssh_pub_key
