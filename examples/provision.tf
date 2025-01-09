@@ -1,11 +1,14 @@
 locals {
+  // Example of user data for a Windows node via a template file
+  # user_data_windows = templatefile("${path.module}/example.tpl", {
+  #   user = "test",
+  # })
   // combine the nodegroup definition with the platform data
   nodegroups_wplatform = { for k, ngd in var.nodegroups : k => merge(ngd, local.platforms_with_sku[ngd.platform]) }
 }
 
 module "provision" {
-  source = "../"
-
+  source           = "../"
   name             = var.name
   location         = var.location
   windows_password = var.windows_password
@@ -26,7 +29,7 @@ module "provision" {
     volume_size : ngd.volume_size
     role : ngd.role
     public : ngd.public
-    user_data : ngd.user_data
+    user_data : strcontains(ngd.platform, "windows") ? local.user_data_windows : ngd.user_data
     user : try(ngd.ssh_user, ngd.winrm_user)
   } }
   securitygroups = local.securitygroups

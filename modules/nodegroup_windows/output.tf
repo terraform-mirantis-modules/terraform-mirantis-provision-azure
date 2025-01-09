@@ -6,3 +6,7 @@ data "azurerm_virtual_machine_scale_set" "windows_hosts" {
 output "nodes" {
   value = { for nk, nv in data.azurerm_virtual_machine_scale_set.windows_hosts.instances : nk => nv }
 }
+
+output "user_data" {
+  value = var.user_data
+}
