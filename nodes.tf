@@ -62,7 +62,7 @@ module "linux_vmms" {
   ssh_pub_key              = module.key.public_key
   volume_size              = each.value.volume_size
   source_image             = each.value.source_image
-  user_data                = "test"
+  user_data                = each.value.user_data
   lb_pool_ids              = concat([], [for ik, iv in var.ingresses : local.map_lb_pools[ik] if contains(iv.nodegroups, each.key)]...)
   app_security_group_names = concat([], [for nk, nv in var.nodegroups : [for sgk, sgv in var.securitygroups : sgk if contains(sgv.nodegroups, nk)]]...)
 
@@ -88,7 +88,7 @@ module "windows_vmms" {
   ssh_pub_key              = module.key.public_key
   volume_size              = each.value.volume_size
   source_image             = each.value.source_image
-  user_data                = "test"
+  user_data                = each.value.user_data
   lb_pool_ids              = concat([], [for ik, iv in var.ingresses : local.map_lb_pools[ik] if contains(iv.nodegroups, each.key)]...)
   app_security_group_names = concat([], [for nk, nv in var.nodegroups : [for sgk, sgv in var.securitygroups : sgk if contains(sgv.nodegroups, nk)]]...)
 

@@ -102,32 +102,50 @@ locals {
       ]
     }
     # Example of a Windows specific security group
-    # "windows" = {
-    #   description = "Windows SG for the Windows machines"
-    #   nodegroups  = [for n, ng in var.nodegroups : n if n == "AWrkWin"]
-    #   ingress_ipv4 = [
-    #     {
-    #       description : "WinRM_Inbound"
-    #       from_port : "*"
-    #       to_port : 5986
-    #       protocol : "Tcp"
-    #       source_address_prefix : "*"
-    #       destination_address_prefix : "*"
-    #       priority : 1005
-    #     }
-    #   ]
-    #   egress_ipv4 = [
-    #     {
-    #       description : "WinRM_Outbound"
-    #       from_port : "*"
-    #       to_port : 5986
-    #       protocol : "Tcp"
-    #       source_address_prefix : "*"
-    #       destination_address_prefix : "*"
-    #       priority : 1006
-    #     }
-    #   ]
-    # }
+    "windows" = {
+      description = "Windows SG for the Windows machines"
+      nodegroups  = [for n, ng in var.nodegroups : n] # if n == "AWrkr"]
+      ingress_ipv4 = [
+        {
+          description : "WinRM_Inbound"
+          from_port : "*"
+          to_port : 5986
+          protocol : "Tcp"
+          source_address_prefix : "*"
+          destination_address_prefix : "*"
+          priority : 1005
+        },
+        {
+          description : "WinRDP_Inbound"
+          from_port : "*"
+          to_port : 3389
+          protocol : "Tcp"
+          source_address_prefix : "*"
+          destination_address_prefix : "*"
+          priority : 1007
+        }
+      ]
+      egress_ipv4 = [
+        {
+          description : "WinRM_Outbound"
+          from_port : "*"
+          to_port : 5986
+          protocol : "Tcp"
+          source_address_prefix : "*"
+          destination_address_prefix : "*"
+          priority : 1006
+        },
+        {
+          description : "WinRDP_Outbound"
+          from_port : "*"
+          to_port : 3389
+          protocol : "Tcp"
+          source_address_prefix : "*"
+          destination_address_prefix : "*"
+          priority : 1008
+        }
+      ]
+    }
   }
 }
 
