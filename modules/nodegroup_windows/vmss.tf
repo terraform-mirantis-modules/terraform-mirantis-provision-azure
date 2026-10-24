@@ -43,8 +43,9 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss" {
   dynamic "network_interface" {
     for_each = var.subnets
     content {
-      name    = "${var.name}-n-interface-${network_interface.key}"
-      primary = var.subnets[0].id == network_interface.value.id ? true : false
+      name                      = "${var.name}-n-interface-${network_interface.key}"
+      network_security_group_id = var.network_security_group_id
+      primary                   = var.subnets[0].id == network_interface.value.id ? true : false
 
       ip_configuration {
         name                                   = "ipconfig-win-${network_interface.key}-${basename(network_interface.value.id)}"

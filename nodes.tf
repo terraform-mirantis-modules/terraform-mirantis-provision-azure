@@ -48,24 +48,25 @@ locals {
 }
 
 module "linux_vmms" {
-  depends_on               = [azurerm_network_security_group.machines]
-  for_each                 = local.nodegroups_linux
-  source                   = "./modules/nodegroup_linux"
-  resource_group_name      = azurerm_resource_group.rg.name
-  resource_group_location  = azurerm_resource_group.rg.location
-  name                     = each.key
-  subnets                  = [for sk, sv in local.map_nodegroups_to_subnets[each.key] : { id : azurerm_subnet.all[sv.id].id, private : sv.private }]
-  vm_count                 = each.value.count
-  vm_size                  = each.value.vm_size
-  type                     = each.value.type
-  role                     = each.value.role
-  ssh_user                 = each.value.user
-  ssh_pub_key              = module.key.public_key
-  volume_size              = each.value.volume_size
-  source_image             = each.value.source_image
-  user_data                = each.value.user_data
-  lb_pool_ids              = concat([], [for ik, iv in var.ingresses : local.map_lb_pools[ik] if contains(iv.nodegroups, each.key)]...)
-  app_security_group_names = concat([], [for nk, nv in var.nodegroups : [for sgk, sgv in var.securitygroups : sgk if contains(sgv.nodegroups, nk)]]...)
+  depends_on                = [azurerm_network_security_group.machines]
+  for_each                  = local.nodegroups_linux
+  source                    = "./modules/nodegroup_linux"
+  resource_group_name       = azurerm_resource_group.rg.name
+  resource_group_location   = azurerm_resource_group.rg.location
+  name                      = each.key
+  subnets                   = [for sk, sv in local.map_nodegroups_to_subnets[each.key] : { id : azurerm_subnet.all[sv.id].id, private : sv.private }]
+  vm_count                  = each.value.count
+  vm_size                   = each.value.vm_size
+  network_security_group_id = length(local.map_sgs[each.key]) > 0 ? data.azurerm_network_security_group.machine_sg[local.map_sgs[each.key][0]].id : null
+  type                      = each.value.type
+  role                      = each.value.role
+  ssh_user                  = each.value.user
+  ssh_pub_key               = module.key.public_key
+  volume_size               = each.value.volume_size
+  source_image              = each.value.source_image
+  user_data                 = each.value.user_data
+  lb_pool_ids               = concat([], [for ik, iv in var.ingresses : local.map_lb_pools[ik] if contains(iv.nodegroups, each.key)]...)
+  app_security_group_names  = concat([], [for nk, nv in var.nodegroups : [for sgk, sgv in var.securitygroups : sgk if contains(sgv.nodegroups, nk)]]...)
 
   tags = merge({
     role = each.value.role
@@ -74,25 +75,26 @@ module "linux_vmms" {
 
 // allowed values https://learn.microsoft.com/en-us/rest/api/compute/virtual-machines/create-or-update?view=rest-compute-2024-03-01&tabs=HTTP#osprofile
 module "windows_vmms" {
-  depends_on               = [azurerm_network_security_group.machines]
-  for_each                 = local.nodegroups_windows
-  source                   = "./modules/nodegroup_windows"
-  resource_group_name      = azurerm_resource_group.rg.name
-  resource_group_location  = azurerm_resource_group.rg.location
-  subnets                  = [for sk, sv in local.map_nodegroups_to_subnets[each.key] : { id : azurerm_subnet.all[sv.id].id, private : sv.private }]
-  name                     = each.key
-  vm_count                 = each.value.count
-  vm_size                  = each.value.vm_size
-  winrm_user               = each.value.user
-  windows_password         = var.windows_password
-  type                     = each.value.type
-  role                     = each.value.role
-  ssh_pub_key              = module.key.public_key
-  volume_size              = each.value.volume_size
-  source_image             = each.value.source_image
-  user_data                = each.value.user_data
-  lb_pool_ids              = concat([], [for ik, iv in var.ingresses : local.map_lb_pools[ik] if contains(iv.nodegroups, each.key)]...)
-  app_security_group_names = concat([], [for nk, nv in var.nodegroups : [for sgk, sgv in var.securitygroups : sgk if contains(sgv.nodegroups, nk)]]...)
+  depends_on                = [azurerm_network_security_group.machines]
+  for_each                  = local.nodegroups_windows
+  source                    = "./modules/nodegroup_windows"
+  resource_group_name       = azurerm_resource_group.rg.name
+  resource_group_location   = azurerm_resource_group.rg.location
+  subnets                   = [for sk, sv in local.map_nodegroups_to_subnets[each.key] : { id : azurerm_subnet.all[sv.id].id, private : sv.private }]
+  name                      = each.key
+  vm_count                  = each.value.count
+  vm_size                   = each.value.vm_size
+  network_security_group_id = length(local.map_sgs[each.key]) > 0 ? data.azurerm_network_security_group.machine_sg[local.map_sgs[each.key][0]].id : null
+  winrm_user                = each.value.user
+  windows_password          = var.windows_password
+  type                      = each.value.type
+  role                      = each.value.role
+  ssh_pub_key               = module.key.public_key
+  volume_size               = each.value.volume_size
+  source_image              = each.value.source_image
+  user_data                 = each.value.user_data
+  lb_pool_ids               = concat([], [for ik, iv in var.ingresses : local.map_lb_pools[ik] if contains(iv.nodegroups, each.key)]...)
+  app_security_group_names  = concat([], [for nk, nv in var.nodegroups : [for sgk, sgv in var.securitygroups : sgk if contains(sgv.nodegroups, nk)]]...)
 
 
   tags = merge({

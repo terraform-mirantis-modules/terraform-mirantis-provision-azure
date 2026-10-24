@@ -35,7 +35,7 @@ variable "securitygroups" {
     ingress_ipv4 = optional(list(object({
       description                = string
       from_port                  = string
-      to_port                    = number
+      to_port                    = string
       protocol                   = string
       destination_address_prefix = string
       source_address_prefix      = string
@@ -44,7 +44,7 @@ variable "securitygroups" {
     egress_ipv4 = optional(list(object({
       description                = string
       from_port                  = string
-      to_port                    = number
+      to_port                    = string
       protocol                   = string
       destination_address_prefix = string
       source_address_prefix      = string

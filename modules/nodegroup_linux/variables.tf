@@ -91,3 +91,9 @@ variable "vm_size" {
   type        = string
   default     = "Standard_DS2_v2"
 }
+
+variable "network_security_group_id" {
+  description = "NSG to attach to the scale set NICs. Azure permits one NSG per subnet, so per-nodegroup filtering must happen at NIC level; without this the securitygroups rules are not enforced anywhere."
+  type        = string
+  default     = null
+}
