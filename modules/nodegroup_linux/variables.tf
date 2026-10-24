@@ -80,5 +80,14 @@ variable "source_image" {
     publisher = string
     offer     = string
     version   = string
+    # true for marketplace images that carry a purchase plan (e.g. resf Rocky);
+    # Canonical/RedHat/Microsoft platform images must NOT send a plan block.
+    plan = optional(bool, false)
   })
+}
+
+variable "vm_size" {
+  description = "Azure VM size (sku) for the scale set instances"
+  type        = string
+  default     = "Standard_DS2_v2"
 }

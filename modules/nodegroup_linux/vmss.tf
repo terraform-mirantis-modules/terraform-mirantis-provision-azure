@@ -15,7 +15,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   name                = "Linux-${var.name}"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
-  sku                 = "Standard_DS2_v2"
+  sku                 = var.vm_size
   instances           = var.vm_count
   admin_username      = var.ssh_user
 
@@ -24,10 +24,13 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   zone_balance = true
   zones        = [1, 2, 3]
 
-  plan {
-    name      = var.source_image.sku
-    publisher = var.source_image.publisher
-    product   = var.source_image.offer
+  dynamic "plan" {
+    for_each = var.source_image.plan ? [1] : []
+    content {
+      name      = var.source_image.sku
+      publisher = var.source_image.publisher
+      product   = var.source_image.offer
+    }
   }
   admin_ssh_key {
     username   = var.ssh_user

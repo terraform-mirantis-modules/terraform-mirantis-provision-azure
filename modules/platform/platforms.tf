@@ -2,11 +2,14 @@
 locals {
   // this is the idea of @jcarrol who put this into a lib map. Here we steal his idea
   lib_platform_definitions = {
+    // URNs verified 2026-10-24 via `az vm image show` in westeurope: the
+    // previous Canonical offer "ubuntu" does not resolve.
     "ubuntu_20.04" : {
       "sku" : "20_04-lts-gen2",
       "publisher" : "Canonical",
-      "offer" : "ubuntu",
+      "offer" : "0001-com-ubuntu-server-focal",
       "version" : "latest",
+      "plan" : false,
       "interface" : "eth0"
       "connection" : "ssh",
       "ssh_user" : "ubuntu",
@@ -16,8 +19,21 @@ locals {
     "ubuntu_22.04" : {
       "sku" : "22_04-lts-gen2",
       "publisher" : "Canonical",
-      "offer" : "ubuntu",
+      "offer" : "0001-com-ubuntu-server-jammy",
       "version" : "latest",
+      "plan" : false,
+      "interface" : "eth0"
+      "connection" : "ssh",
+      "ssh_user" : "ubuntu",
+      "ssh_port" : 22,
+      "type" : "linux"
+    },
+    "ubuntu_24.04" : {
+      "sku" : "server",
+      "publisher" : "Canonical",
+      "offer" : "ubuntu-24_04-lts",
+      "version" : "latest",
+      "plan" : false,
       "interface" : "eth0"
       "connection" : "ssh",
       "ssh_user" : "ubuntu",
@@ -35,11 +51,15 @@ locals {
       "ssh_port" : 22,
       "type" : "linux"
     },
+    // resf Rocky images carry a marketplace purchase plan; the plan flag makes
+    // the nodegroup modules emit the plan block (terms must be accepted once
+    // per subscription: az vm image terms accept --urn resf:rockylinux-x86_64:<sku>:latest)
     "rocky_8" : {
       "sku" : "8-base",
       "publisher" : "resf",
       "offer" : "rockylinux-x86_64",
       "version" : "latest",
+      "plan" : true,
       "interface" : "eth0"
       "connection" : "ssh",
       "ssh_user" : "rocky",
@@ -51,6 +71,7 @@ locals {
       "publisher" : "resf",
       "offer" : "rockylinux-x86_64",
       "version" : "latest",
+      "plan" : true,
       "interface" : "eth0"
       "connection" : "ssh",
       "ssh_user" : "rocky",

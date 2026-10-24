@@ -64,9 +64,11 @@ variable "nodegroups" {
       offer     = string
       publisher = string
       version   = string
+      plan      = optional(bool, false)
     })
     platform              = string
     type                  = string
+    vm_size               = optional(string, "Standard_DS2_v2")
     count                 = number
     volume_size           = number
     role                  = string

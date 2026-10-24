@@ -56,6 +56,7 @@ module "linux_vmms" {
   name                     = each.key
   subnets                  = [for sk, sv in local.map_nodegroups_to_subnets[each.key] : { id : azurerm_subnet.all[sv.id].id, private : sv.private }]
   vm_count                 = each.value.count
+  vm_size                  = each.value.vm_size
   type                     = each.value.type
   role                     = each.value.role
   ssh_user                 = each.value.user
@@ -81,6 +82,7 @@ module "windows_vmms" {
   subnets                  = [for sk, sv in local.map_nodegroups_to_subnets[each.key] : { id : azurerm_subnet.all[sv.id].id, private : sv.private }]
   name                     = each.key
   vm_count                 = each.value.count
+  vm_size                  = each.value.vm_size
   winrm_user               = each.value.user
   windows_password         = var.windows_password
   type                     = each.value.type
