@@ -85,5 +85,20 @@ variable "source_image" {
     publisher = string
     offer     = string
     version   = string
+    # true for marketplace images that carry a purchase plan (e.g. resf Rocky);
+    # Canonical/RedHat/Microsoft platform images must NOT send a plan block.
+    plan = optional(bool, false)
   })
+}
+
+variable "vm_size" {
+  description = "Azure VM size (sku) for the scale set instances"
+  type        = string
+  default     = "Standard_DS2_v2"
+}
+
+variable "network_security_group_id" {
+  description = "NSG to attach to the scale set NICs. Azure permits one NSG per subnet, so per-nodegroup filtering must happen at NIC level; without this the securitygroups rules are not enforced anywhere."
+  type        = string
+  default     = null
 }

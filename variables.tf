@@ -35,7 +35,7 @@ variable "securitygroups" {
     ingress_ipv4 = optional(list(object({
       description                = string
       from_port                  = string
-      to_port                    = number
+      to_port                    = string
       protocol                   = string
       destination_address_prefix = string
       source_address_prefix      = string
@@ -44,7 +44,7 @@ variable "securitygroups" {
     egress_ipv4 = optional(list(object({
       description                = string
       from_port                  = string
-      to_port                    = number
+      to_port                    = string
       protocol                   = string
       destination_address_prefix = string
       source_address_prefix      = string
@@ -64,9 +64,11 @@ variable "nodegroups" {
       offer     = string
       publisher = string
       version   = string
+      plan      = optional(bool, false)
     })
     platform              = string
     type                  = string
+    vm_size               = optional(string, "Standard_DS2_v2")
     count                 = number
     volume_size           = number
     role                  = string

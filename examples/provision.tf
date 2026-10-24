@@ -22,9 +22,11 @@ module "provision" {
       offer : ngd.offer
       publisher : ngd.publisher
       version : "latest"
+      plan : try(ngd.plan, false)
     }
     platform : ngd.platform
     type : ngd.type
+    vm_size : try(ngd.vm_size, "Standard_DS2_v2")
     count : ngd.count
     volume_size : ngd.volume_size
     role : ngd.role
