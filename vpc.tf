@@ -5,36 +5,6 @@ resource "azurerm_resource_group" "rg" {
   tags     = local.tags
 }
 
-resource "azurerm_network_security_group" "main" {
-  name                = "main-nsg"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  security_rule {
-    name                       = "inbound_main"
-    priority                   = 101
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "outbound_main"
-    priority                   = 102
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-  tags = local.tags
-}
 
 locals {
   app_sgs_inbound  = { for k, v in var.securitygroups : k => [for ik, iv in v.ingress_ipv4 : ik] }
@@ -143,39 +113,3 @@ resource "azurerm_network_interface" "subnet" {
   tags = local.tags
 }
 
-resource "azurerm_subnet_network_security_group_association" "public" {
-  for_each                  = local.pub_subnets
-  subnet_id                 = azurerm_subnet.all[each.key].id
-  network_security_group_id = azurerm_network_security_group.public.id
-}
-
-resource "azurerm_network_security_group" "public" {
-  name                = "public-nsg"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  security_rule {
-    name                       = "publicIn"
-    priority                   = 103
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "publicOut"
-    priority                   = 104
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-  tags = local.tags
-}
