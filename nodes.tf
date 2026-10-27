@@ -55,6 +55,7 @@ module "linux_vmms" {
   resource_group_location   = azurerm_resource_group.rg.location
   name                      = each.key
   subnets                   = [for sk, sv in local.map_nodegroups_to_subnets[each.key] : { id : azurerm_subnet.all[sv.id].id, private : sv.private }]
+  public                    = each.value.public
   vm_count                  = each.value.count
   vm_size                   = each.value.vm_size
   network_security_group_id = length(local.map_sgs[each.key]) > 0 ? data.azurerm_network_security_group.machine_sg[local.map_sgs[each.key][0]].id : null
@@ -81,6 +82,7 @@ module "windows_vmms" {
   resource_group_name       = azurerm_resource_group.rg.name
   resource_group_location   = azurerm_resource_group.rg.location
   subnets                   = [for sk, sv in local.map_nodegroups_to_subnets[each.key] : { id : azurerm_subnet.all[sv.id].id, private : sv.private }]
+  public                    = each.value.public
   name                      = each.key
   vm_count                  = each.value.count
   vm_size                   = each.value.vm_size

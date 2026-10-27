@@ -12,6 +12,12 @@ variable "subnets" {
   }))
 }
 
+variable "public" {
+  description = "Give each scale set instance a public IP. Ignored for private subnets, which never receive one."
+  type        = bool
+  default     = true
+}
+
 variable "ssh_pub_key" {
   description = "SSH public key"
   type        = string
