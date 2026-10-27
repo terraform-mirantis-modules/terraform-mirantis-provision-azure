@@ -15,6 +15,20 @@ locals {
   map_sgs = { for nk, nv in var.nodegroups : nk => [for sgk, sgv in var.securitygroups : sgk if contains(sgv.nodegroups, nk)] }
 }
 
+locals {
+  // Keys of every security group attached to any nodegroup. The flattening
+  // across all nodegroups matches the list the modules were previously given
+  // and is left unchanged here.
+  app_sg_keys = distinct(concat([], [for nk, nv in var.nodegroups : local.map_sgs[nk]]...))
+
+  // Ids taken straight from the ASG resources, so the scale set NICs depend on
+  // the ASGs through the graph instead of re-reading them by name.
+  app_security_group_ids = concat(
+    [for sgk in local.app_sg_keys : azurerm_application_security_group.machines_inbound[sgk].id],
+    [for sgk in local.app_sg_keys : azurerm_application_security_group.machines_outbound[sgk].id],
+  )
+}
+
 resource "null_resource" "ingresses" {
   triggers = {
     count = length(module.ingress)
@@ -66,7 +80,7 @@ module "linux_vmms" {
   source_image              = each.value.source_image
   user_data                 = each.value.user_data
   lb_pool_ids               = concat([], [for ik, iv in var.ingresses : local.map_lb_pools[ik] if contains(iv.nodegroups, each.key)]...)
-  app_security_group_names  = concat([], [for nk, nv in var.nodegroups : [for sgk, sgv in var.securitygroups : sgk if contains(sgv.nodegroups, nk)]]...)
+  app_security_group_ids    = local.app_security_group_ids
 
   tags = merge({
     role = each.value.role
@@ -94,7 +108,7 @@ module "windows_vmms" {
   source_image              = each.value.source_image
   user_data                 = each.value.user_data
   lb_pool_ids               = concat([], [for ik, iv in var.ingresses : local.map_lb_pools[ik] if contains(iv.nodegroups, each.key)]...)
-  app_security_group_names  = concat([], [for nk, nv in var.nodegroups : [for sgk, sgv in var.securitygroups : sgk if contains(sgv.nodegroups, nk)]]...)
+  app_security_group_ids    = local.app_security_group_ids
 
 
   tags = merge({
