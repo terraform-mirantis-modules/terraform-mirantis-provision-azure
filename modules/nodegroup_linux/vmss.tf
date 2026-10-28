@@ -66,9 +66,10 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
         load_balancer_backend_address_pool_ids = var.lb_pool_ids
         application_security_group_ids         = toset(concat([for asg in data.azurerm_application_security_group.asg_in : asg.id], [for asg in data.azurerm_application_security_group.asg_out : asg.id]))
 
-        // if the subnet is private don't create a public ip address
+        // a public ip is created only if the node group asks for one, and only
+        // on a non-private subnet (a private subnet can never carry one.)
         dynamic "public_ip_address" {
-          for_each = network_interface.value.private ? [] : [1]
+          for_each = var.public && !network_interface.value.private ? [1] : []
           content {
             name = "${var.name}-linux-ip-${network_interface.key}-${basename(network_interface.value.id)}"
           }
