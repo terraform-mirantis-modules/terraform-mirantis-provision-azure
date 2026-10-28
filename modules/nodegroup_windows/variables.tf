@@ -74,8 +74,8 @@ variable "volume_size" {
   type        = number
 }
 
-variable "app_security_group_names" {
-  description = "The application security groups to apply to the machine"
+variable "app_security_group_ids" {
+  description = "Ids of the application security groups to attach to the scale set NICs. Ids are passed in rather than looked up by name so that the attachment carries a real dependency on the ASG resources."
   type        = list(string)
 }
 

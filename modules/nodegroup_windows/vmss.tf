@@ -1,15 +1,3 @@
-data "azurerm_application_security_group" "asg_in" {
-  count               = length(var.app_security_group_names)
-  name                = "${var.app_security_group_names[count.index]}-asg-inbound"
-  resource_group_name = var.resource_group_name
-}
-
-data "azurerm_application_security_group" "asg_out" {
-  count               = length(var.app_security_group_names)
-  name                = "${var.app_security_group_names[count.index]}-asg-outbound"
-  resource_group_name = var.resource_group_name
-}
-
 # This file contains the code to create a Windows Virtual Machine Scale Set
 resource "azurerm_windows_virtual_machine_scale_set" "vmss" {
   name                = "Windows-${var.name}"
@@ -52,7 +40,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss" {
         primary                                = var.subnets[0].id == network_interface.value.id ? true : false
         subnet_id                              = network_interface.value.id
         load_balancer_backend_address_pool_ids = var.lb_pool_ids
-        application_security_group_ids         = toset(concat([for asg in data.azurerm_application_security_group.asg_in : asg.id], [for asg in data.azurerm_application_security_group.asg_out : asg.id]))
+        application_security_group_ids         = toset(var.app_security_group_ids)
 
         // a public ip is created only if the node group asks for one, and only
         // on a non-private subnet (a private subnet can never carry one.)
