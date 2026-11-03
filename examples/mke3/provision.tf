@@ -10,7 +10,7 @@ locals {
 }
 
 module "provision" {
-  source           = "../"
+  source           = "../../"
   name             = var.name
   location         = var.location
   windows_password = local.windows_password
