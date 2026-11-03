@@ -1,4 +1,7 @@
+.terraform/
 *.tfstate*
-ssh-keys/*
 *.tfvars
+*.pem
+ssh-keys/*
 plan
+launchpad.y*ml

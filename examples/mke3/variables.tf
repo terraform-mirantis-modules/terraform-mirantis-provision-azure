@@ -39,14 +39,17 @@ variable "subnets" {
 variable "nodegroups" {
   description = "A map of machine group definitions"
   type = map(object({
-    platform              = string
-    type                  = string
-    count                 = number
-    volume_size           = number
-    role                  = string
-    public                = bool
-    user                  = optional(string)
-    user_data             = optional(string)
+    platform    = string
+    type        = string
+    count       = number
+    volume_size = number
+    role        = string
+    public      = bool
+    user        = optional(string)
+    // defaulted to "" rather than left null: the nodegroup modules call
+    // base64encode(var.user_data), which fails on null with
+    // "Invalid value for \"str\" parameter: argument must not be null."
+    user_data             = optional(string, "")
     instance_profile_name = optional(string)
     tags                  = optional(map(string), {})
   }))
