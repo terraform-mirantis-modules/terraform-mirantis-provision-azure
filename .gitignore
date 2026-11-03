@@ -1,1 +1,12 @@
 .terraform
+
+# A root-level apply writes state, keys and variable files next to the
+# module. None of it belongs in a published repository; .tfvars.example
+# files are kept because they do not match *.tfvars.
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.pem
+*.key
+ssh-keys/
+plan

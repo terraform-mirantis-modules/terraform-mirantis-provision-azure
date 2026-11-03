@@ -1,8 +1,10 @@
 locals {
-  // Example of user data for a Windows node via a template file
-  # user_data_windows = templatefile("${path.module}/example.tpl", {
-  #   user = "test",
-  # })
+  // Example of user data for a Windows node via a template file. Referenced
+  // by the module call below, so it has to stay defined: commenting it out
+  // leaves examples/ failing `terraform validate`.
+  user_data_windows = templatefile("${path.module}/example.tpl", {
+    user = "test",
+  })
   // combine the nodegroup definition with the platform data
   nodegroups_wplatform = { for k, ngd in var.nodegroups : k => merge(ngd, local.platforms_with_sku[ngd.platform]) }
 }
@@ -11,7 +13,7 @@ module "provision" {
   source           = "../"
   name             = var.name
   location         = var.location
-  windows_password = var.windows_password
+  windows_password = local.windows_password
   ingresses        = local.launchpad_ingresses
   network          = var.network
   subnets          = var.subnets

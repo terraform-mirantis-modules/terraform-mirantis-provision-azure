@@ -58,12 +58,6 @@ variable "location" {
   type        = string
 }
 
-variable "windows_password" {
-  description = "Password to use with windows & winrm"
-  type        = string
-  default     = ""
-}
-
 variable "common_tags" {
   description = "Tags that should be applied to all resources created"
   type        = map(string)

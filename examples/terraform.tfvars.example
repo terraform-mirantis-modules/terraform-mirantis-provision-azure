@@ -70,5 +70,7 @@ common_tags = {
   owner       = "mirantis"
 }
 
-// set a windows password, if you have windows nodes
+// The Windows/WinRM administrator password is generated unless you set one
+// here. Read the effective value after apply with:
+//   terraform output -raw windows_password
 # windows_password = ""
