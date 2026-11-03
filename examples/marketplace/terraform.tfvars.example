@@ -1,0 +1,56 @@
+// Stack name; also the resource group name (CHANGE THIS)
+name = "marketplace-smoke"
+
+location = "East US"
+
+// subscription_id has no default and is not stored in this repository. Pass
+// it on the command line:
+//   terraform plan -var "subscription_id=<your-azure-subscription-id>"
+// or set ARM_SUBSCRIPTION_ID in the environment.
+
+network = {
+  cidr               = "172.31.0.0/16"
+  enable_vpn_gateway = false
+  enable_nat_gateway = false
+}
+
+subnets = {
+  "main" = {
+    cidr       = "172.31.0.0/17"
+    nodegroups = ["mgr", "wrk"]
+    private    = false
+  }
+}
+
+// Mixed on purpose, so one plan covers both branches of the purchase-plan
+// conditional in the nodegroup modules:
+//   mgr: rocky_9  -> resf marketplace image, plan = true  -> plan block emitted
+//   wrk: ubuntu_22.04 -> Canonical image, plan = false -> no plan block
+// rocky_8 is the other plan = true entry and can be swapped in for either.
+//
+// Marketplace terms are accepted once per subscription before an apply:
+//   az vm image terms accept --urn resf:rockylinux-x86_64:9-base:latest
+//
+// Both vm_size values differ from the module default (Standard_DS2_v2).
+nodegroups = {
+  "mgr" = {
+    platform    = "rocky_9"
+    vm_size     = "Standard_D4as_v5"
+    count       = 1
+    volume_size = 100
+    role        = "manager"
+    public      = true
+  }
+  "wrk" = {
+    platform    = "ubuntu_22.04"
+    vm_size     = "Standard_D2as_v5"
+    count       = 1
+    volume_size = 100
+    role        = "worker"
+    public      = true
+  }
+}
+
+common_tags = {
+  purpose = "marketplace-example"
+}
