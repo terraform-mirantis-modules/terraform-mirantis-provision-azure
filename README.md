@@ -41,7 +41,16 @@ module "provision" {
 ```
 
 ## Examples
-If you want to see full example, check the [examples folder](./examples).
+
+The [examples folder](./examples) holds one directory per example, each
+with its own README and `terraform.tfvars.example`:
+
+- [`examples/mke3`](./examples/mke3) - a full MKE 3 stack with Linux and
+  Windows nodegroups, rendering `launchpad.yaml`.
+- [`examples/marketplace`](./examples/marketplace) - a marketplace image
+  carrying a purchase plan (`source_image.plan = true`), non-default
+  `vm_size` values, a port-translating load balancer rule
+  (443 to 33001), and a security group with no egress rules.
 
 ## License
 

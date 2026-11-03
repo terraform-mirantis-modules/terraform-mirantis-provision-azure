@@ -1,4 +1,0 @@
-*.tfstate*
-ssh-keys/*
-*.tfvars
-plan

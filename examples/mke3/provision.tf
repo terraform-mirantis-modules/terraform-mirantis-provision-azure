@@ -5,12 +5,19 @@ locals {
   user_data_windows = templatefile("${path.module}/example.tpl", {
     user = "test",
   })
+  // Equivalent for linux nodes. modules/nodegroup_linux always sets
+  // custom_data = base64encode(var.user_data), and the azurerm provider
+  // rejects an empty custom_data, so every linux nodegroup has to carry some
+  // user_data; this is the fallback when the caller supplies none.
+  user_data_linux = templatefile("${path.module}/example_linux.tpl", {
+    user = "test",
+  })
   // combine the nodegroup definition with the platform data
   nodegroups_wplatform = { for k, ngd in var.nodegroups : k => merge(ngd, local.platforms_with_sku[ngd.platform]) }
 }
 
 module "provision" {
-  source           = "../"
+  source           = "../../"
   name             = var.name
   location         = var.location
   windows_password = local.windows_password
@@ -33,7 +40,7 @@ module "provision" {
     volume_size : ngd.volume_size
     role : ngd.role
     public : ngd.public
-    user_data : strcontains(ngd.platform, "windows") ? local.user_data_windows : ngd.user_data
+    user_data : strcontains(ngd.platform, "windows") ? local.user_data_windows : (ngd.user_data != "" ? ngd.user_data : local.user_data_linux)
     user : try(ngd.ssh_user, ngd.winrm_user)
   } }
   securitygroups = local.securitygroups
